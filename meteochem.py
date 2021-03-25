@@ -86,11 +86,25 @@ elements = {
 molecules = {'H2': {'T3':  13.80},
              'N2': {'T3':  63.15},
              'O2': {'T3':  54.36},
+             'F2': {'T3':  53.48},
 
              'He': {'T3':   2.18},
              'Ne': {'T3':  24.56},
              'Ar': {'T3':  83.81},
              
+             'C':  {'T3':  3915},
+             'Al': {'T3':  933.47},
+             'Mg': {'T3':  923},
+             'Si': {'T3':  1687},
+             'Ti': {'T3':  1941},
+             'Cr': {'T3':  2180},
+             'Mn': {'T3':  1519},
+             'Fe': {'T3':  1811},
+             'Co': {'T3':  1768},
+             'Ni': {'T3':  1728},
+             'Cu': {'T3':  1358},
+             'Zn': {'T3':   693},
+
              'CH4': {'T3':  90.67},
              'NH3': {'T3': 195.4},
              'H2O': {'T3': 273.16},
@@ -191,7 +205,7 @@ for mol in mollist:
     print(f'{mol} => {molecules[mol]!r}')
 
 
-needmols = 1000
+needmols = random.uniform(1000,20000)
 
 countpermol = {}
 totalmols = 0
@@ -229,15 +243,15 @@ def nebula_molecules(elemsperdraw, mintw=0, mint3=0):
 # d <-> sqrt(1/T**4)   or  d <-> 1/T**2
 # (d1 * T1**2 == d2 * T2**2)   or   T2**2 == d1 / d2 * T1**2
                     
-#cutoff = random.uniform(5,35)
+cutoff = random.uniform(7,35)
 au = random.uniform(2.06,3.27)
 #cutoff = random.uniform(0, 35)
-cutoff = 0
+#cutoff = 0
 #au = random.uniform(0.001,20)
 tempatau = 250
 temp = math.sqrt(1 / au * tempatau**2)
 
-draw = int(random.uniform(1, 10000))
+draw = int(random.uniform(1000, 10000))
 for mol, howmany in nebula_molecules(draw, cutoff, temp):
     if mol in countpermol:
         countpermol[mol] += howmany
