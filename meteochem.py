@@ -1,7 +1,7 @@
 #!/bin/env python3
 
+import math
 import random
-import time
 
 ## Abundance is relative to silicon=1000
 
@@ -83,15 +83,59 @@ elements = {
            'a': 65.38}
     }
 
+molecules = {'H2': {'T3':  13.80},
+             'N2': {'T3':  63.15},
+             'O2': {'T3':  54.36},
 
-molecules = ('H2', 'He', 'Ne', 'Ar',
-             'CH4', 'NH3', 'H2O', 'H2S',
-             'N2',
-             'CO', 'CO2', 'O2', 'MgO', 'Al2O3', 'SiO2', 'SO2', 'CaO', 'TiO2', 'Cr2O3', 'MnO',
-             'Fe3O4', 'FeS', 'Co3O4', 'CoS', 'Ni2O3', 'NiS', 'Cu', 'Cu2O', 'Cu2S', 'ZnO', 'ZnS',
+             'He': {'T3':   2.18},
+             'Ne': {'T3':  24.56},
+             'Ar': {'T3':  83.81},
              
-             'HF', 'H3PO4', 'H2SO4', 'HCl',
-             'NaOH', 'KOH')
+             'CH4': {'T3':  90.67},
+             'NH3': {'T3': 195.4},
+             'H2O': {'T3': 273.16},
+             'HF':  {'T3': 190},
+             'H2S': {'T3': 187.66},
+             'HCl': {'T3': 161.15},
+
+             'CO':    {'T3':  67.9},
+             'CO2':   {'T3': 216.58},
+             'P2O5':  {'T3': 613},
+             'SO2':   {'T3': 197.64},
+
+             'H3PO4': {'T3': 314},
+
+             'MgO':   {'T3': 3125},
+             'Al2O3': {'T3': 2345},
+             'SiO2':  {'T3': 3220},
+             'CaO':   {'T3': 2886},
+             'TiO2':  {'T3': 2116},
+             'Cr2O3': {'T3': 2708},
+             'MnO':   {'T3': 2218},
+             'Fe3O4': {'T3': 1870},
+             'Co3O4': {'T3': 1168},
+             'NiO':   {'T3': 2228},
+             'Cu2O':  {'T3': 1505},
+             'ZnO':   {'T3': 2247},
+             
+             'MnS':   {'T3': 1983},
+             'FeS':   {'T3': 1467},
+             'CoS':   {'T3': 1468},
+             'NiS':   {'T3': 1070},
+             'Cu2S':  {'T3': 1400},
+             'ZnS':   {'T3': 2120},
+
+             'NaF':   {'T3': 1266},
+             'NaCl':  {'T3': 1073},
+             'Mg2F':  {'T3': 1536},
+             'Mg2Cl': {'T3':  987},
+             'CaF2':  {'T3': 1691},
+             'CaCl2': {'T3': 1046},
+             'KF':    {'T3': 1131},
+             'KCl':   {'T3': 1040}
+             }
+
+
 
 def moldata(mol):
     components = {}
@@ -137,11 +181,14 @@ for name, data in elements.items():
     enames += (name,)
     eweights += (data['abundance'],)
 
+for name, data in molecules.items():
+    print(f'Constructing data sheet for {name} ...')
+    data.update(moldata(name))
 
-mollist = sorted(((mol, moldata(mol)) for mol in molecules), key=lambda x: x[1]['a'], reverse=True)
+mollist = sorted(molecules.keys(), key=lambda k: molecules[k]['a'], reverse=True)
 
-#for mol, data in mollist:
-#    print(f'{mol} => {data!r}')
+for mol in mollist:
+    print(f'{mol} => {molecules[mol]!r}')
 
 
 needmols = 1000
@@ -149,14 +196,16 @@ needmols = 1000
 countpermol = {}
 totalmols = 0
 
-def nebula_molecules(elemsperdraw, mintw=0):
+def nebula_molecules(elemsperdraw, mintw=0, mint3=0):
     elems = dict((n, 0) for n in enames)
     
     while True:
         for e in random.choices(enames, eweights, k=elemsperdraw):
             elems[e] += 1
-                
-        for mol, data in mollist:
+
+        #print(repr(elems))
+        for mol in mollist:
+            data = molecules[mol]
             howmany = None
             for e, n in data['components'].items():
                 hm = elems[e] // n
@@ -171,13 +220,25 @@ def nebula_molecules(elemsperdraw, mintw=0):
                 for e, n in data['components'].items():
                     elems[e] -= howmany * n
 
-                if data['a'] >= mintw:
+                if data['a'] >= mintw and data['T3'] >= mint3:
                     yield (mol, howmany)
 
 
-cutoff = random.uniform(5,35)
+# E <-> T**4    # Stefan-Boltzmann Law  (Is proportional to)
+# E <-> 1/d**2   or   d**2 <-> 1/E   or   d <-> sqrt(1/E)
+# d <-> sqrt(1/T**4)   or  d <-> 1/T**2
+# (d1 * T1**2 == d2 * T2**2)   or   T2**2 == d1 / d2 * T1**2
+                    
+#cutoff = random.uniform(5,35)
+au = random.uniform(2.06,3.27)
+#cutoff = random.uniform(0, 35)
+cutoff = 0
+#au = random.uniform(0.001,20)
+tempatau = 250
+temp = math.sqrt(1 / au * tempatau**2)
+
 draw = int(random.uniform(1, 10000))
-for mol, howmany in nebula_molecules(draw, cutoff):
+for mol, howmany in nebula_molecules(draw, cutoff, temp):
     if mol in countpermol:
         countpermol[mol] += howmany
     else:
@@ -192,8 +253,9 @@ for mol, howmany in nebula_molecules(draw, cutoff):
 weightpermol = dict((k, moldata(k)['a'] * v) for k,v in countpermol.items())
 totalweight = sum(weightpermol.values())
 
+print(f"==== Dist ({au:.2f} AU) ==== Temp ({temp:.1f}K) ==== Flux ({cutoff:.1f} Da) ====")
 for mol, molmany in sorted(countpermol.items(), key=lambda x:weightpermol[x[0]], reverse=True):
-    print(f"{mol:>7s}: {weightpermol[mol]*100/totalweight:>7.2f}%  ({molmany})")
+    print(f"  {mol:>7s}: {weightpermol[mol]*100/totalweight:>7.2f}%  ({molmany})")
     
             
             
