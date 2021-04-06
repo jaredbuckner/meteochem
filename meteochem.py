@@ -149,7 +149,11 @@ molecules = {'H2': {'T3':  13.80, 'Hf': 0.0},
              'CaF2':  {'T3': 1691, 'Hf': -1225.91},
              'CaCl2': {'T3': 1046, 'Hf': -795.42},
              'KF':    {'T3': 1131, 'Hf': -568.61},
-             'KCl':   {'T3': 1040, 'Hf': -436}
+             'KCl':   {'T3': 1040, 'Hf': -436},
+
+             # Orthosilicates - Olivines
+             'Mg2SiO4':  {'T3': 2163, 'Hf': -2056},
+             'Fe2SiO4':  {'T3': 1473, 'Hf': -1379},
              }
 
 
@@ -204,8 +208,10 @@ for name, data in elements.items():
 for name, data in molecules.items():
     print(f'Constructing data sheet for {name} ...')
     data.update(moldata(name))
+    data['aepa'] = data['Hf'] / data['n']
+    data['aepb'] = 0.0 if data['n'] == 1 else data['Hf'] / (data['n'] - 1.0)
 
-mollist = sorted(molecules.keys(), key=lambda k: (molecules[k]['Hf'] / molecules[k]['n'], -molecules[k]['a']))
+mollist = sorted(molecules.keys(), key=lambda k: (molecules[k]['aepa'], -molecules[k]['a']))
 
 for mol in mollist:
     print(f'{mol} => {molecules[mol]!r}')
