@@ -205,7 +205,7 @@ for name, data in molecules.items():
     print(f'Constructing data sheet for {name} ...')
     data.update(moldata(name))
 
-mollist = sorted(molecules.keys(), key=lambda k: molecules[k]['Hf'] / molecules[k]['n'])
+mollist = sorted(molecules.keys(), key=lambda k: (molecules[k]['Hf'] / molecules[k]['n'], -molecules[k]['a']))
 
 for mol in mollist:
     print(f'{mol} => {molecules[mol]!r}')
@@ -248,14 +248,24 @@ def nebula_molecules(elemsperdraw, mintw=0, mint3=0):
 # E <-> 1/d**2   or   d**2 <-> 1/E   or   d <-> sqrt(1/E)
 # d <-> sqrt(1/T**4)   or  d <-> 1/T**2
 # (d1 * T1**2 == d2 * T2**2)   or   T2**2 == d1 / d2 * T1**2
-                    
-cutoff = random.uniform(0,35)
-au = random.uniform(2.06,3.27)
+
+
+choice = random.randint(0,2)
+if choice == 0:
+    #cutoff = random.uniform(0,35)
+    au = random.uniform(2.06,3.27)
+elif choice == 1:
+    #cutoff = random.uniform(0, 5)
+    au = random.uniform(30, 50)
+elif choice == 2:
+    au = random.uniform(20000,50000)
+    
+    
 #cutoff = random.uniform(0, 35)
-#cutoff = 0
+cutoff = 0
 #au = random.uniform(0.001,20)
 tempatau = 250
-temp = math.sqrt(1 / au * tempatau**2)
+temp = max(math.sqrt(1 / au * tempatau**2), 3.2)
 
 draw = int(random.uniform(1000, 10000))
 for mol, howmany in nebula_molecules(draw, cutoff, temp):
