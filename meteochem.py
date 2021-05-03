@@ -120,11 +120,11 @@ molecules = {'H2': {'T3':  13.80, 'Hf': 0.0},
              'P2O5':  {'T3': 613,    'Hf': -1452},
              'SO2':   {'T3': 197.64, 'Hf': -296.81},
 
-             'H3PO4': {'T3': 314, 'Hf': -1271.7},
-
+             'Na2O':  {'T3': 1405, 'Hf': -416},
              'MgO':   {'T3': 3125, 'Hf': -601.6},
              'Al2O3': {'T3': 2345, 'Hf': -1675.7},
              'SiO2':  {'T3': 3220, 'Hf': -911},
+             'K2O':   {'T3': 1010, 'Hf': -363.17},
              'CaO':   {'T3': 2886, 'Hf': -635},
              'TiO2':  {'T3': 2116, 'Hf': -945},
              'Cr2O3': {'T3': 2708, 'Hf': -1128},
@@ -142,6 +142,14 @@ molecules = {'H2': {'T3':  13.80, 'Hf': 0.0},
              'NiS':   {'T3': 1070, 'Hf': -87.86},
              'Cu2S':  {'T3': 1400, 'Hf': -120},  # Estimated, badly?
              'ZnS':   {'T3': 2120, 'Hf': -204.6},
+
+             'H3PO4': {'T3': 314,    'Hf': -1271.7},
+             'H2SO4': {'T3': 283.46, 'Hf': -814},
+
+             'NaOH':   {'T3': 596, 'Hf': -425.8},
+             'MgO2H2': {'T3': 623, 'Hf': -924.7},
+             'KOH':    {'T3': 633, 'Hf': -425.8},
+             'CaO2H2': {'T3': 853, 'Hf': -987},
 
              'NaF':   {'T3': 1266, 'Hf': -573.6},
              'NaCl':  {'T3': 1073, 'Hf': -411.12},
@@ -254,16 +262,21 @@ def nebula_molecules(elemsperdraw, mintw=0, mint3=0):
 # (d1 * T1**2 == d2 * T2**2)   or   T2**2 == d1 / d2 * T1**2
 
 
-choice = random.randint(0,2)
-if choice == 0:
-    #cutoff = random.uniform(0,35)
-    au = random.uniform(2.06,3.27)
-elif choice == 1:
-    #cutoff = random.uniform(0, 5)
-    au = random.uniform(30, 50)
-elif choice == 2:
-    au = random.uniform(20000,50000)
-    
+## choice = random.randint(0,3)
+## if choice == 0:
+##     au = random.uniform(0.1, 2.0)
+## if choice == 1:
+##     #cutoff = random.uniform(0,35)
+##     au = random.uniform(2.06,3.27)
+## elif choice == 2:
+##     #cutoff = random.uniform(0, 5)
+##     au = random.uniform(30, 50)
+## elif choice == 3:
+##     au = random.uniform(20000,50000)
+sigma = (2.06 + 3.27) / 2.0
+left = random.gauss(0,sigma)
+right = random.gauss(0,sigma)
+au = math.sqrt(left * left + right * right)
     
 #cutoff = random.uniform(0, 35)
 cutoff = 0
