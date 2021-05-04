@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 import numpy as np;
+import random;
 
 ## Abundance is relative to silicon=1000
 
@@ -244,7 +245,67 @@ def balance(reagents, products):
     # R0 * mr0 + R1 * mr1 = P0 * mp0 + P1 * mp1
 
 
+## In the form, a set indicates alternation, and a tuple indicates serialization
+_X2O = (frozenset(('Na2O', 'K2O', 'Cu2O')),)
+_XO = (frozenset(('MgO', 'CaO', 'MnO', 'FeO', 'CoO', 'NiO', 'ZnO')),)
+_X2O3 = (frozenset(('Al2O3', 'Cr2O3', 'Fe2O3')),)
+_SIO2 = ('SiO2',)
+_AC = (frozenset(('NaOH', 'NaF', 'NaCl', 'KOH', 'KF', 'KCl')),)
+_AACC = (frozenset(((_AC + _AC), 'MgO2H2', 'MgF2', 'MgCl2', 'CaO2H2', 'CaF2', 'CaCl2')),)
+
+minerals = (
+    {'name': 'Olivine',
+     'form': 2*_XO + _SIO2 },
+    {'name': 'Plagioclase',
+     'form': (frozenset((2*_XO + _X2O3, _X2O + 2*_SIO2)),) + _X2O3 + 4*_SIO2 },
+    {'name': 'Pyroxene',
+     'form': (frozenset((4*_XO, _X2O + _X2O3)),) +  4*_SIO2 },
+    {'name': 'Amphibole',
+     'form': _AACC + (frozenset((4*_XO, 2*_X2O + _X2O3)),) + 2 * _XO + 8 * _SIO2 },
+    {'name': 'Mica',
+     'form': _AACC + _AACC + 2*_XO + 2*_X2O3 + 6 * _SIO2 },
+    {'name': 'Orthoclase',
+     'form': _X2O + _X2O3 + 6 * _SIO2 },
+    {'name': 'Quartz',
+     'form': _SIO2 },
+);
+
+
+def drawfrom(mineralform, molmany):
+    if isinstance(mineralform, str):
+        if mineralform in molmany and molmany[mineralform] > 0:
+            molmany[mineralform] -= 1
+            return (mineralform,)
+        else:
+            return None
+    elif isinstance(mineralform, frozenset):
+        bits = list(mineralform)
+        random.shuffle(bits)
+        for part in bits:
+            quaffle = drawfrom(part, molmany)
+            if quaffle:
+                return quaffle
+        return None
+    else:
+        bits = ()
+        for part in mineralform:
+            quaffle = drawfrom(part, molmany)
+            if quaffle:
+                bits = bits + quaffle
+            else:
+                for unroll in bits:
+                    molmany[unroll] += 1
+                return None
+        return bits
+    
+
 if __name__ == '__main__':
     for mol in mollist:
         print(f'{mol} => {molecules[mol]!r}')
 
+
+    molmany = {'FeO':10, 'MgO': 10, 'Na2O': 10, 'NaOH': 10, 'MgO2H2': 10, 'Al2O3':10, 'SiO2': 100}
+    for mineral in minerals:
+        print(mineral['name'], drawfrom(mineral['form'], molmany))
+    
+    print(molmany)

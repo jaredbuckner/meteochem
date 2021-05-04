@@ -4,31 +4,6 @@ import math
 import moldata
 import random
 
-## In the form, a set indicates alternation, and a tuple indicates serialization
-#  _X2O = ({'Na2O', 'K2O', 'Cu2O'},)
-#  _XO = ({'MgO', 'CaO', 'MnO', 'FeO', 'CoO', 'NiO', 'ZnO'},)
-#  _X2O3 = ({'Al2O3', 'Cr2O3', 'Fe2O3'},)
-#  _XO2 = ('TiO2',)
-#  _SIO2 = ('SiO2',)
-#  _AC = ({'NaOH', 'NaF', 'NaCl', 'KOH', 'KF', 'KCl'},)
-#  _AACC = ({(_AC + _AC), 'MgO2H2', 'MgF2', 'MgCl2', 'CaO2H2', 'CaF2', 'CaCl2'},)
-#  
-#  minerals = (
-#      {'name': 'Olivine',
-#       'form': 2*_XO + _SIO2 },
-#      {'name': 'Plagioclase',
-#       'form': ({2*_XO + _X2O3, _X2O + 2*_SIO2},) + _X2O3 + 4*_SIO2 },
-#      {'name': 'Pyroxene',
-#       'form': ({4*_XO, _X2O + _X2O3},) +  4*_SIO2 },
-#      {'name': 'Amphibole',
-#       'form': _AACC + ({4*_XO, 2*_X2O + _X2O3},) + 2 * _XO + 8 * _SIO2 },
-#      {'name': 'Mica',
-#       'form': _AACC + _AACC + 2*XO + 2*_X2O3 + 6 * _SIO2 },
-#      {'name': 'Orthoclase',
-#       'form': _X2O + _X2O3 + 6 * _SIO2 },
-#      {'name': 'Quartz',
-#       'form': _SIO2 },
-#  );
 
 
 
