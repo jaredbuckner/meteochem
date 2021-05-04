@@ -85,6 +85,9 @@ elements = {
 # T3: Triple point temperature (K), where available.  Melting point is used when unavailable.
 # Hf: Standard enthalpy of formation (kJ/mol)
 
+# T3: Triple point temperature (K), where available.  Melting point is used when unavailable.
+# Hf: Standard enthalpy of formation (kJ/mol)
+
 molecules = {'H2': {'T3':  13.80, 'Hf': 0.0},
              'N2': {'T3':  63.15, 'Hf': 0.0},
              'O2': {'T3':  54.36, 'Hf': 0.0},
@@ -119,16 +122,17 @@ molecules = {'H2': {'T3':  13.80, 'Hf': 0.0},
              'P2O5':  {'T3': 613,    'Hf': -1452},
              'SO2':   {'T3': 197.64, 'Hf': -296.81},
 
-             'H3PO4': {'T3': 314, 'Hf': -1271.7},
-
+             'Na2O':  {'T3': 1405, 'Hf': -416},
              'MgO':   {'T3': 3125, 'Hf': -601.6},
              'Al2O3': {'T3': 2345, 'Hf': -1675.7},
              'SiO2':  {'T3': 3220, 'Hf': -911},
+             'K2O':   {'T3': 1010, 'Hf': -363.17},
              'CaO':   {'T3': 2886, 'Hf': -635},
              'TiO2':  {'T3': 2116, 'Hf': -945},
              'Cr2O3': {'T3': 2708, 'Hf': -1128},
              'MnO':   {'T3': 2218, 'Hf': -385},
-             'Fe3O4': {'T3': 1870, 'Hf': -1120.89},
+             'FeO':   {'T3': 1650, 'Hf': -272.04},
+             'Fe2O3': {'T3': 1812, 'Hf': -824.20},
              'CoO':   {'T3': 2206, 'Hf': -237.74},
              'NiO':   {'T3': 2228, 'Hf': -240},
              'Cu2O':  {'T3': 1505, 'Hf': -170},
@@ -141,18 +145,23 @@ molecules = {'H2': {'T3':  13.80, 'Hf': 0.0},
              'Cu2S':  {'T3': 1400, 'Hf': -120},  # Estimated, badly?
              'ZnS':   {'T3': 2120, 'Hf': -204.6},
 
+             'H3PO4': {'T3': 314,    'Hf': -1271.7},
+             'H2SO4': {'T3': 283.46, 'Hf': -814},
+
+             'NaOH':   {'T3': 596, 'Hf': -425.8},
+             'MgO2H2': {'T3': 623, 'Hf': -924.7},
+             'KOH':    {'T3': 633, 'Hf': -425.8},
+             'CaO2H2': {'T3': 853, 'Hf': -987},
+
              'NaF':   {'T3': 1266, 'Hf': -573.6},
              'NaCl':  {'T3': 1073, 'Hf': -411.12},
-             'Mg2F':  {'T3': 1536, 'Hf': -1124.2},
-             'Mg2Cl': {'T3':  987, 'Hf': -641.1},
-             'CaF2':  {'T3': 1691, 'Hf': -1225.91},
-             'CaCl2': {'T3': 1046, 'Hf': -795.42},
+             'MgF2':  {'T3': 1536, 'Hf': -1124.2},
+             'MgCl2': {'T3':  987, 'Hf': -641.1},
              'KF':    {'T3': 1131, 'Hf': -568.61},
              'KCl':   {'T3': 1040, 'Hf': -436},
+             'CaF2':  {'T3': 1691, 'Hf': -1225.91},
+             'CaCl2': {'T3': 1046, 'Hf': -795.42},
 
-             # Orthosilicates - Olivines
-             'Mg2SiO4':  {'T3': 2163, 'Hf': -2056},
-             'Fe2SiO4':  {'T3': 1473, 'Hf': -1379},
              }
 
 
