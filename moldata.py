@@ -221,6 +221,22 @@ for name, data in molecules.items():
 
 mollist = sorted(molecules.keys(), key=lambda k: (molecules[k]['aepa'], -molecules[k]['a']))
 
+def silica_content(data):
+    if 'Si' in data['components'] and 'O' in data['components']:
+        m = min(data['components']['Si'], data['components']['O'] // 2)
+        w = molecules['SiO2']['a'] * m
+        return w / data['a']
+    else:
+        return 0
+
+def silica_classify(frac):
+    return("Non-silicous"        if frac <= 0.0 else
+           "Ultramafic"          if frac < 0.45 else
+           "Mafic"               if frac < 0.52 else
+           "Intermediate"        if frac < 0.63 else
+           "Intermediate-felsic" if frac < 0.69 else
+           "Felsic")
+        
 
 def balance(reagents, products):
     atomsA = dict();
@@ -246,26 +262,32 @@ def balance(reagents, products):
 
 
 ## In the form, a set indicates alternation, and a tuple indicates serialization
-_X2O = (frozenset(('Na2O', 'K2O', 'Cu2O')),)
-_XO = (frozenset(('MgO', 'CaO', 'MnO', 'FeO', 'CoO', 'NiO', 'ZnO')),)
-_X2O3 = (frozenset(('Al2O3', 'Cr2O3', 'Fe2O3')),)
+_MO = (frozenset(('MgO', 'MnO', 'FeO', 'CoO', 'NiO', 'ZnO')),)
 _SIO2 = ('SiO2',)
+_XO = (frozenset(('MgO', 'CaO', 'MnO', 'FeO', 'CoO', 'NiO', 'ZnO')),)
+_A2O = (frozenset(('Na2O', 'K2O')),)
+_X2O3 = (frozenset(('Al2O3', 'Cr2O3', 'Fe2O3')),)
+_AOH = (frozenset(('NaOH','KOH')),)
+_AAOHOH = (frozenset(((_AOH + _AOH), 'MgO2H2', 'CaO2H2')),)
 _AC = (frozenset(('NaOH', 'NaF', 'NaCl', 'KOH', 'KF', 'KCl')),)
 _AACC = (frozenset(((_AC + _AC), 'MgO2H2', 'MgF2', 'MgCl2', 'CaO2H2', 'CaF2', 'CaCl2')),)
 
+
 minerals = (
     {'name': 'Olivine',
-     'form': 2*_XO + _SIO2 },
+     'form': 2*_MO + _SIO2 },
+    {'name': 'Titanite',
+     'form': ('CaO', 'TiO2') + _SIO2},
     {'name': 'Plagioclase',
-     'form': (frozenset((2*_XO + _X2O3, _X2O + 2*_SIO2)),) + _X2O3 + 4*_SIO2 },
+     'form': (frozenset((('CaO', 'CaO', 'Al2O3'), ('Na2O',) + 2*_SIO2)),) + ('Al2O3',) + 4*_SIO2 },
     {'name': 'Pyroxene',
-     'form': (frozenset((4*_XO, _X2O + _X2O3)),) +  4*_SIO2 },
+     'form': (frozenset((4*_XO, _A2O + _X2O3)),) +  4*_SIO2 },
     {'name': 'Amphibole',
-     'form': _AACC + (frozenset((4*_XO, 2*_X2O + _X2O3)),) + 2 * _XO + 8 * _SIO2 },
+     'form': _AAOHOH + (frozenset((4*_XO, 2*_A2O + _X2O3)),) + 2 * _XO + 8 * _SIO2 },
     {'name': 'Mica',
      'form': _AACC + _AACC + 2*_XO + 2*_X2O3 + 6 * _SIO2 },
     {'name': 'Orthoclase',
-     'form': _X2O + _X2O3 + 6 * _SIO2 },
+     'form': _A2O + ('Al2O3',) + 6 * _SIO2 },
     {'name': 'Quartz',
      'form': _SIO2 },
 );
@@ -297,7 +319,49 @@ def drawfrom(mineralform, molmany):
                     molmany[unroll] += 1
                 return None
         return bits
-    
+
+def silicamelt(molmany):
+    order = ['Na', 'K', 'Mg', 'Ca', 'Ti', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Al', 'Si', 'C', 'N', 'P', 'S', 'O', 'H', 'F', 'Cl', 'He', 'Ne', 'Ar']
+    activeminerals = list(minerals)
+    mineraldata = dict()
+
+    while activeminerals:
+        midx = random.randrange(0, len(activeminerals))
+        mineral = activeminerals[midx]
+        mineralname = mineral['name']
+        
+        components = drawfrom(mineral['form'], molmany)
+        if components:
+            if mineralname not in mineraldata:
+                mineraldata[mineralname] = {'molecules': dict(),
+                                            'forms':     dict()}
+                
+            atoms = dict()
+            for mol in components:
+                if mol in mineraldata[mineralname]['molecules']:
+                    mineraldata[mineralname]['molecules'][mol] += 1
+                else:
+                    mineraldata[mineralname]['molecules'][mol] = 1
+                    
+                for atom, m in molecules[mol]['components'].items():
+                    atoms[atom] = atoms[atom] + m if atom in atoms else m
+                    
+            formula = ''.join(atom + ('' if atoms[atom]==1 else str(atoms[atom])) for atom in order if atom in atoms)
+            if formula in mineraldata[mineralname]['forms']:
+                mineraldata[mineralname]['forms'][formula] += 1
+            else:
+                mineraldata[mineralname]['forms'][formula] = 1
+        else:
+            del activeminerals[midx]
+
+    for m, d in mineraldata.items():
+        d.update(process(''.join((f * q for f, q in d['forms'].items()))))
+        scont = silica_content(d)
+        sclass = silica_classify(scont)
+        d['scont'] = scont
+        d['sclass']   = sclass
+
+    return mineraldata
 
 if __name__ == '__main__':
     for mol in mollist:
@@ -305,7 +369,12 @@ if __name__ == '__main__':
 
 
     molmany = {'FeO':10, 'MgO': 10, 'Na2O': 10, 'NaOH': 10, 'MgO2H2': 10, 'Al2O3':10, 'SiO2': 100}
-    for mineral in minerals:
-        print(mineral['name'], drawfrom(mineral['form'], molmany))
-    
+    mineraldata=silicamelt(molmany)
+
+    for m, d in mineraldata.items():
+        print(f"{m:12s} {d['sclass']:>12s} ({d['scont']*100:6.2f}%)")
+        print(f"  FORMS: {d['forms']!r}")
+        print(f"  MOLES: {d['molecules']!r}")
+        
     print(molmany)
+    

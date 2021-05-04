@@ -87,6 +87,15 @@ totalweight = sum(weightpermol.values())
 print(f"==== Dist ({au:.2f} AU) ==== Temp ({temp:.1f}K) ==== Flux ({cutoff:.1f} Da) ====")
 for mol, molmany in sorted(countpermol.items(), key=lambda x:weightpermol[x[0]], reverse=True):
     print(f"  {mol:>7s}: {weightpermol[mol]*100/totalweight:>7.2f}%  ({molmany})")
+
+mineraldata = moldata.silicamelt(countpermol)
+totalmineralweight = sum(d['a'] for d in mineraldata.values())
+
+for m, d in sorted(mineraldata.items(), key=lambda z:z[1]['a'], reverse=True):
+    print(f"{m:12s} {d['sclass']:>12s} ({d['scont']*100:6.2f}%)")
+    print(f"  FORMS: {d['forms']!r}")
+    print(f"  MOLES: {d['molecules']!r}")
+    print(f"  WT%:   {d['a']*100/totalmineralweight:6.2f}%")
     
-            
-            
+print(countpermol)
+ 
