@@ -153,15 +153,40 @@ molecules = {'H2': {'T3':  13.80, 'Hf': 0.0},
 
              'NaF':   {'T3': 1266, 'Hf': -573.6},
              'NaCl':  {'T3': 1073, 'Hf': -411.12},
-             'Mg2F':  {'T3': 1536, 'Hf': -1124.2},
-             'Mg2Cl': {'T3':  987, 'Hf': -641.1},
-             'CaF2':  {'T3': 1691, 'Hf': -1225.91},
-             'CaCl2': {'T3': 1046, 'Hf': -795.42},
+             'MgF2':  {'T3': 1536, 'Hf': -1124.2},
+             'MgCl2': {'T3':  987, 'Hf': -641.1},
              'KF':    {'T3': 1131, 'Hf': -568.61},
              'KCl':   {'T3': 1040, 'Hf': -436},
+             'CaF2':  {'T3': 1691, 'Hf': -1225.91},
+             'CaCl2': {'T3': 1046, 'Hf': -795.42},
 
              }
 
+## In the form, a set indicates alternation, and a tuple indicates serialization
+_X2O = ({'Na2O', 'K2O', 'Cu2O'},)
+_XO = ({'MgO', 'CaO', 'MnO', 'FeO', 'CoO', 'NiO', 'ZnO'},)
+_X2O3 = ({'Al2O3', 'Cr2O3', 'Fe2O3'},)
+_XO2 = ('TiO2',)
+_SIO2 = ('SiO2',)
+_AC = ({'NaOH', 'NaF', 'NaCl', 'KOH', 'KF', 'KCl'},)
+_AACC = ({(_AC + AC), 'MgO2H2', 'MgF2', 'MgCl2', 'CaO2H2', 'CaF2', 'CaCl2'},)
+
+minerals = (
+    {'name': 'Olivine',
+     'form': 2*_XO + _SIO2 },
+    {'name': 'Plagioclase',
+     'form': ({2*_XO + _X2O3, _X2O + 2*_SIO2},) + _X2O3 + 4*_SIO2 },
+    {'name': 'Pyroxene',
+     'form': ({4*_XO, _X2O + _X2O3},) +  4*_SIO2 },
+    {'name': 'Amphibole',
+     'form': _AACC + ({4*_XO, 2*_X2O + _X2O3},) + 2 * _XO + 8 * _SIO2 },
+    {'name': 'Mica':
+     'form': _AACC + _AACC + 2*XO + 2*_X2O3 + 6 * _SIO2 },
+    {'name': 'Orthoclase',
+     'form': _X2O + _X2O3 + 6 * _SIO2 },
+    {'name': 'Quartz',
+     'form': _SIO2 },
+);
 
 
 def moldata(mol):
