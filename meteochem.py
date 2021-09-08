@@ -5,6 +5,8 @@ import moldata
 import random
 
 
+## Making Oxygen less abundant
+##moldata.elements['O']['abundance'], moldata.elements['C']['abundance'] = moldata.elements['C']['abundance'], moldata.elements['O']['abundance']
 
 
 needmols = random.uniform(1000,50000)
